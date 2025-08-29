@@ -58,11 +58,11 @@ struct MainTabView: View {
                 }
                 .tag(2)
             
-            // Messages
-            MessagesView()
+            // Inquiries
+            InquiriesView()
                 .tabItem {
-                    Image(systemName: "message")
-                    Text("Messages")
+                    Image(systemName: "tray")
+                    Text("Inquiries")
                 }
                 .tag(3)
             
@@ -91,21 +91,6 @@ struct PatientsView: View {
 
 // Calendar view is now implemented in Features/Calendar/CalendarView.swift
 
-struct MessagesView: View {
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Messages will be displayed here")
-                    .bodyStyle(.large, color: .textSecondary)
-                
-                Spacer()
-            }
-            .padding()
-            .navigationTitle("Messages")
-            .navigationBarTitleDisplayMode(.large)
-        }
-    }
-}
 
 struct MoreView: View {
     @EnvironmentObject private var authService: AuthService
@@ -114,10 +99,6 @@ struct MoreView: View {
         NavigationView {
             List {
                 Section {
-                    NavigationLink(destination: InquiriesView()) {
-                        Label("Inquiries", systemImage: "tray")
-                    }
-                    
                     NavigationLink(destination: EvaluationsView()) {
                         Label("Evaluations", systemImage: "doc.text")
                     }

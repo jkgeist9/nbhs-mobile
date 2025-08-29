@@ -24,6 +24,9 @@ struct NBHSMobileApp: App {
     }
     
     private func setupApp() {
+        // Test custom fonts are loading
+        Typography.testFontLoading()
+        
         // Configure app appearance
         configureNavigationAppearance()
         configureTabBarAppearance()

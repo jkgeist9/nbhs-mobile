@@ -58,53 +58,53 @@ struct Typography {
         }
     }
     
-    // MARK: - Display Fonts (Lexend)
+    // MARK: - Display Fonts (Montserrat)
     
-    static let display9xl = Font.custom(display, size: 128).weight(.bold)     // 8rem
-    static let display8xl = Font.custom(display, size: 96).weight(.bold)      // 6rem
-    static let display7xl = Font.custom(display, size: 72).weight(.bold)      // 4.5rem
-    static let display6xl = Font.custom(display, size: 60).weight(.bold)      // 3.75rem
-    static let display5xl = Font.custom(display, size: 48).weight(.bold)      // 3rem
-    static let display4xl = Font.custom(display, size: 40).weight(.bold)      // 2.5rem
-    static let display3xl = Font.custom(display, size: 32).weight(.bold)      // 2rem
-    static let display2xl = Font.custom(display, size: 24).weight(.bold)      // 1.5rem
-    static let displayXl = Font.custom(display, size: 20).weight(.bold)       // 1.25rem
-    static let displayLg = Font.custom(display, size: 18).weight(.bold)       // 1.125rem
+    static let display9xl = Font.montserrat(128, weight: .bold)               // 8rem
+    static let display8xl = Font.montserrat(96, weight: .bold)                // 6rem
+    static let display7xl = Font.montserrat(72, weight: .bold)                // 4.5rem
+    static let display6xl = Font.montserrat(60, weight: .bold)                // 3.75rem
+    static let display5xl = Font.montserrat(48, weight: .bold)                // 3rem
+    static let display4xl = Font.montserrat(40, weight: .bold)                // 2.5rem
+    static let display3xl = Font.montserrat(32, weight: .bold)                // 2rem
+    static let display2xl = Font.montserrat(24, weight: .bold)                // 1.5rem
+    static let displayXl = Font.montserrat(20, weight: .bold)                 // 1.25rem
+    static let displayLg = Font.montserrat(18, weight: .bold)                 // 1.125rem
     
-    // MARK: - Heading Fonts (Inter)
+    // MARK: - Heading Fonts (Montserrat)
     
-    static let heading1 = Font.custom(sans, size: 32).weight(.bold)           // H1
-    static let heading2 = Font.custom(sans, size: 28).weight(.bold)           // H2
-    static let heading3 = Font.custom(sans, size: 24).weight(.semibold)       // H3
-    static let heading4 = Font.custom(sans, size: 20).weight(.semibold)       // H4
-    static let heading5 = Font.custom(sans, size: 18).weight(.medium)         // H5
-    static let heading6 = Font.custom(sans, size: 16).weight(.medium)         // H6
+    static let heading1 = Font.montserrat(32, weight: .bold)                  // H1
+    static let heading2 = Font.montserrat(28, weight: .bold)                  // H2
+    static let heading3 = Font.montserrat(24, weight: .semibold)              // H3
+    static let heading4 = Font.montserrat(20, weight: .semibold)              // H4
+    static let heading5 = Font.montserrat(18, weight: .medium)                // H5
+    static let heading6 = Font.montserrat(16, weight: .medium)                // H6
     
-    // MARK: - Body Text (Inter)
+    // MARK: - Body Text (Montserrat)
     
-    static let bodyXl = Font.custom(sans, size: 20).weight(.regular)          // 1.25rem
-    static let bodyLarge = Font.custom(sans, size: 18).weight(.regular)       // 1.125rem
-    static let body = Font.custom(sans, size: 16).weight(.regular)            // 1rem - Base size
-    static let bodyMedium = Font.custom(sans, size: 14).weight(.regular)      // 0.875rem
-    static let bodySmall = Font.custom(sans, size: 12).weight(.regular)       // 0.75rem
+    static let bodyXl = Font.montserrat(20, weight: .regular)                 // 1.25rem
+    static let bodyLarge = Font.montserrat(18, weight: .regular)              // 1.125rem
+    static let body = Font.montserrat(16, weight: .regular)                   // 1rem - Base size
+    static let bodyMedium = Font.montserrat(14, weight: .regular)             // 0.875rem
+    static let bodySmall = Font.montserrat(12, weight: .regular)              // 0.75rem
     
-    // MARK: - Label Text
+    // MARK: - Label Text (Montserrat)
     
-    static let labelLarge = Font.custom(sans, size: 16).weight(.medium)       
-    static let label = Font.custom(sans, size: 14).weight(.medium)            
-    static let labelSmall = Font.custom(sans, size: 12).weight(.medium)       
-    static let labelTiny = Font.custom(sans, size: 10).weight(.medium)        
+    static let labelLarge = Font.montserrat(16, weight: .medium)              
+    static let label = Font.montserrat(14, weight: .medium)                   
+    static let labelSmall = Font.montserrat(12, weight: .medium)              
+    static let labelTiny = Font.montserrat(10, weight: .medium)        
     
-    // MARK: - Caption Text
+    // MARK: - Caption Text (Montserrat)
     
-    static let caption = Font.custom(sans, size: 12).weight(.regular)         
-    static let captionSmall = Font.custom(sans, size: 10).weight(.regular)    
+    static let caption = Font.montserrat(12, weight: .regular)                
+    static let captionSmall = Font.montserrat(10, weight: .regular)    
     
-    // MARK: - Button Text
+    // MARK: - Button Text (Montserrat)
     
-    static let buttonLarge = Font.custom(sans, size: 16).weight(.semibold)    
-    static let button = Font.custom(sans, size: 14).weight(.semibold)         
-    static let buttonSmall = Font.custom(sans, size: 12).weight(.semibold)    
+    static let buttonLarge = Font.montserrat(16, weight: .semibold)           
+    static let button = Font.montserrat(14, weight: .semibold)                
+    static let buttonSmall = Font.montserrat(12, weight: .semibold)    
     
     // MARK: - Specialized Fonts
     
@@ -118,6 +118,30 @@ struct Typography {
         case normal = 1.5
         case relaxed = 1.625
         case loose = 2.0
+    }
+    
+    // MARK: - Font Loading Test
+    
+    static func testFontLoading() {
+        let fontNames = [
+            "Montserrat-Regular",
+            "Montserrat-Medium", 
+            "Montserrat-SemiBold",
+            "Montserrat-Bold",
+            "Merriweather-Regular",
+            "Merriweather-Bold"
+        ]
+        
+        print("=== Font Loading Test ===")
+        for fontName in fontNames {
+            let font = UIFont(name: fontName, size: 16)
+            if font != nil {
+                print("✅ \(fontName) loaded successfully")
+            } else {
+                print("❌ \(fontName) failed to load")
+            }
+        }
+        print("=== End Font Test ===")
     }
 }
 
@@ -133,11 +157,24 @@ extension Font {
     }
     
     static func merriweather(_ size: CGFloat, weight: Typography.FontWeight = .regular) -> Font {
-        Font.custom(Typography.merriweather + "-" + weight.name, size: size)
+        let fontName: String
+        switch weight {
+        case .bold: fontName = "Merriweather-Bold"
+        default: fontName = "Merriweather-Regular"
+        }
+        return Font.custom(fontName, size: size)
     }
     
     static func montserrat(_ size: CGFloat, weight: Typography.FontWeight = .regular) -> Font {
-        Font.custom(Typography.montserrat + "-" + weight.name, size: size)
+        let fontName: String
+        switch weight {
+        case .regular: fontName = "Montserrat-Regular"
+        case .medium: fontName = "Montserrat-Medium"
+        case .semibold: fontName = "Montserrat-SemiBold"
+        case .bold: fontName = "Montserrat-Bold"
+        default: fontName = "Montserrat-Regular"
+        }
+        return Font.custom(fontName, size: size)
     }
 }
 

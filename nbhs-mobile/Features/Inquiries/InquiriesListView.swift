@@ -30,8 +30,7 @@ struct InquiriesListView: View {
                 // Inquiry List
                 inquiryList
             }
-            .navigationTitle("Inquiries")
-            .navigationBarTitleDisplayMode(.large)
+            .nbNavigationTitle("Inquiries")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {

@@ -61,15 +61,12 @@ struct LoginView: View {
             
             // NBHS Logo
             VStack(spacing: 16) {
-                // Logo placeholder (replace with actual logo)
-                Circle()
-                    .fill(Color.teal500)
-                    .frame(width: 80, height: 80)
-                    .overlay(
-                        Text("NBHS")
-                            .font(Typography.display4xl)
-                            .foregroundColor(.white)
-                    )
+                // NBHS Logo
+                Image("NBHSLogo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 120, height: 80)
+                    .clipped()
                 
                 VStack(spacing: 8) {
                     Text("NeuroBehavioral Health Services")

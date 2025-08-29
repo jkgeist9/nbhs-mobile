@@ -52,8 +52,7 @@ struct DashboardView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 20)
             }
-            .navigationTitle("Dashboard")
-            .navigationBarTitleDisplayMode(.large)
+            .nbNavigationTitle("Dashboard")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {

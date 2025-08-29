@@ -33,8 +33,7 @@ struct PatientsListView: View {
                 // Patient List
                 patientList
             }
-            .navigationTitle("Patients")
-            .navigationBarTitleDisplayMode(.large)
+            .nbNavigationTitle("Patients")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {

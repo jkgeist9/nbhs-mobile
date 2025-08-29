@@ -526,3 +526,15 @@ enum InquirySortOption: String, CaseIterable {
         }
     }
 }
+
+enum SortOrder: String, CaseIterable {
+    case ascending = "asc"
+    case descending = "desc"
+    
+    var displayName: String {
+        switch self {
+        case .ascending: return "A-Z"
+        case .descending: return "Z-A"
+        }
+    }
+}

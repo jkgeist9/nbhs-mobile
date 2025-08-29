@@ -60,7 +60,12 @@ class DashboardService: ObservableObject {
     @MainActor
     func markTaskComplete(_ taskId: String) async -> Bool {
         do {
-            let request = ["taskId": taskId, "isCompleted": true] as [String: Any]
+            struct TaskCompleteRequest: Codable {
+                let taskId: String
+                let isCompleted: Bool
+            }
+            
+            let request = TaskCompleteRequest(taskId: taskId, isCompleted: true)
             let response: APIResponse<TaskItem> = try await apiClient.post(
                 endpoint: "/tasks/\(taskId)/complete",
                 body: request
@@ -82,9 +87,14 @@ class DashboardService: ObservableObject {
     @MainActor
     func markAlertRead(_ alertId: String) async -> Bool {
         do {
+            struct AlertReadRequest: Codable {
+                let isRead: Bool
+            }
+            
+            let request = AlertReadRequest(isRead: true)
             let response: APIResponse<AlertItem> = try await apiClient.post(
                 endpoint: "/alerts/\(alertId)/read",
-                body: ["isRead": true]
+                body: request
             )
             
             if response.success {
@@ -118,45 +128,67 @@ class DashboardService: ObservableObject {
     // MARK: - Private Helper Methods
     
     private func updateLocalTask(_ taskId: String, isCompleted: Bool) {
-        guard var data = dashboardData else { return }
+        guard let data = dashboardData else { return }
         
         if let index = data.pendingTasks.firstIndex(where: { $0.id == taskId }) {
-            var updatedTask = data.pendingTasks[index]
-            updatedTask = TaskItem(
-                id: updatedTask.id,
-                title: updatedTask.title,
-                description: updatedTask.description,
-                priority: updatedTask.priority,
-                dueDate: updatedTask.dueDate,
-                patientId: updatedTask.patientId,
-                patientName: updatedTask.patientName,
+            let existingTask = data.pendingTasks[index]
+            let updatedTask = TaskItem(
+                id: existingTask.id,
+                title: existingTask.title,
+                description: existingTask.description,
+                priority: existingTask.priority,
+                dueDate: existingTask.dueDate,
+                patientId: existingTask.patientId,
+                patientName: existingTask.patientName,
                 isCompleted: isCompleted,
-                category: updatedTask.category
+                category: existingTask.category
             )
-            data.pendingTasks[index] = updatedTask
-            self.dashboardData = data
+            
+            var updatedTasks = data.pendingTasks
+            updatedTasks[index] = updatedTask
+            
+            let updatedData = DashboardData(
+                statistics: data.statistics,
+                recentActivity: data.recentActivity,
+                upcomingAppointments: data.upcomingAppointments,
+                pendingTasks: updatedTasks,
+                alerts: data.alerts
+            )
+            
+            self.dashboardData = updatedData
         }
     }
     
     private func updateLocalAlert(_ alertId: String, isRead: Bool) {
-        guard var data = dashboardData else { return }
+        guard let data = dashboardData else { return }
         
         if let index = data.alerts.firstIndex(where: { $0.id == alertId }) {
-            var updatedAlert = data.alerts[index]
-            updatedAlert = AlertItem(
-                id: updatedAlert.id,
-                type: updatedAlert.type,
-                title: updatedAlert.title,
-                message: updatedAlert.message,
-                severity: updatedAlert.severity,
-                timestamp: updatedAlert.timestamp,
+            let existingAlert = data.alerts[index]
+            let updatedAlert = AlertItem(
+                id: existingAlert.id,
+                type: existingAlert.type,
+                title: existingAlert.title,
+                message: existingAlert.message,
+                severity: existingAlert.severity,
+                timestamp: existingAlert.timestamp,
                 isRead: isRead,
-                actionRequired: updatedAlert.actionRequired,
-                patientId: updatedAlert.patientId,
-                patientName: updatedAlert.patientName
+                actionRequired: existingAlert.actionRequired,
+                patientId: existingAlert.patientId,
+                patientName: existingAlert.patientName
             )
-            data.alerts[index] = updatedAlert
-            self.dashboardData = data
+            
+            var updatedAlerts = data.alerts
+            updatedAlerts[index] = updatedAlert
+            
+            let updatedData = DashboardData(
+                statistics: data.statistics,
+                recentActivity: data.recentActivity,
+                upcomingAppointments: data.upcomingAppointments,
+                pendingTasks: data.pendingTasks,
+                alerts: updatedAlerts
+            )
+            
+            self.dashboardData = updatedData
         }
     }
 }

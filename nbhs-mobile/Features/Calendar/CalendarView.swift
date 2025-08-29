@@ -305,9 +305,7 @@ struct CalendarView: View {
         let month = calendar.component(.month, from: calendarService.selectedDate)
         let year = calendar.component(.year, from: calendarService.selectedDate)
         
-        guard let monthStart = calendar.date(from: DateComponents(year: year, month: month, day: 1)),
-              let monthRange = calendar.range(of: .day, in: .month, for: monthStart),
-              let monthEnd = calendar.date(byAdding: .day, value: monthRange.count - 1, to: monthStart) else {
+        guard let monthStart = calendar.date(from: DateComponents(year: year, month: month, day: 1)) else {
             return []
         }
         

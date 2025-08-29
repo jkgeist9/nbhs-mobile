@@ -90,16 +90,8 @@ struct PatientDetailView: View {
                         )
                         
                         InfoChip(
-                            icon: patient.status.icon,
-                            text: patient.status.displayName,
-                            color: getStatusColor(patient.status)
-                        )
-                    }
-                    
-                    if let assignedProviderName = patient.assignedProviderName {
-                        InfoChip(
-                            icon: "stethoscope",
-                            text: assignedProviderName,
+                            icon: "person.circle",
+                            text: patient.status,
                             color: .textSecondary
                         )
                     }
@@ -200,6 +192,7 @@ struct PatientDetailView: View {
                 StatCard(
                     title: "Total Visits",
                     value: "\(appointments.filter { $0.status == .completed }.count)",
+                    subtitle: "Completed appointments",
                     icon: "calendar.badge.checkmark",
                     color: .success
                 )
@@ -207,21 +200,24 @@ struct PatientDetailView: View {
                 StatCard(
                     title: "Upcoming",
                     value: "\(appointments.filter { $0.isUpcoming }.count)",
+                    subtitle: "Future appointments",
                     icon: "calendar.badge.plus",
                     color: .teal500
                 )
                 
                 StatCard(
-                    title: "Last Visit",
-                    value: patient.daysSinceLastAppointment != nil ? "\(patient.daysSinceLastAppointment!) days ago" : "None",
-                    icon: "clock",
+                    title: "Evaluations",
+                    value: "\(patient.evaluationsCount ?? 0)",
+                    subtitle: "Total evaluations",
+                    icon: "doc.text",
                     color: .textSecondary
                 )
                 
                 StatCard(
-                    title: "Patient Since",
-                    value: patient.createdAt.formatted(.dateTime.year()),
-                    icon: "person.badge.plus",
+                    title: "Appointments",
+                    value: "\(patient.appointmentsCount ?? 0)",
+                    subtitle: "Total appointments",
+                    icon: "calendar",
                     color: .info
                 )
             }
@@ -255,20 +251,18 @@ struct PatientDetailView: View {
                 .headingStyle(.h4)
             
             VStack(spacing: 8) {
-                InfoRow(label: "Date of Birth", value: patient.dateOfBirth.formatted(date: .long, time: .omitted))
-                
-                if let address = patient.address {
-                    InfoRow(label: "Address", value: address.fullAddress)
+                if let dateOfBirth = patient.dateOfBirth {
+                    InfoRow(label: "Date of Birth", value: dateOfBirth.formatted(date: .long, time: .omitted))
                 }
                 
-                if let emergency = patient.emergencyContact {
-                    InfoRow(label: "Emergency Contact", value: "\(emergency.name) (\(emergency.relationship))")
-                    InfoRow(label: "Emergency Phone", value: emergency.phone)
+                if let publicId = patient.publicId {
+                    InfoRow(label: "Patient ID", value: publicId)
                 }
                 
-                if let insurance = patient.insurance {
-                    InfoRow(label: "Insurance", value: insurance.provider)
-                    InfoRow(label: "Policy Number", value: insurance.policyNumber)
+                InfoRow(label: "Status", value: patient.status)
+                
+                if let workflowStatus = patient.patientWorkflowStatus {
+                    InfoRow(label: "Workflow Status", value: workflowStatus)
                 }
             }
         }
@@ -332,66 +326,20 @@ struct PatientDetailView: View {
             Text("Medical Information")
                 .headingStyle(.h4)
             
-            if let medicalRecord = patient.medicalRecord {
-                VStack(alignment: .leading, spacing: 16) {
-                    // Primary Diagnosis
-                    if let primaryDiagnosis = medicalRecord.primaryDiagnosis {
-                        MedicalSection(title: "Primary Diagnosis", content: primaryDiagnosis)
-                    }
-                    
-                    // Secondary Diagnoses
-                    if !medicalRecord.secondaryDiagnoses.isEmpty {
-                        MedicalSection(
-                            title: "Secondary Diagnoses",
-                            content: medicalRecord.secondaryDiagnoses.joined(separator: "\n")
-                        )
-                    }
-                    
-                    // Current Medications
-                    if !medicalRecord.medications.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Current Medications")
-                                .bodyStyle(.medium, color: .textSecondary)
-                            
-                            ForEach(medicalRecord.medications.filter { $0.isActive }) { medication in
-                                MedicationRow(medication: medication)
-                            }
-                        }
-                    }
-                    
-                    // Allergies
-                    if !medicalRecord.allergies.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Allergies")
-                                .bodyStyle(.medium, color: .textSecondary)
-                            
-                            ForEach(medicalRecord.allergies) { allergy in
-                                AllergyRow(allergy: allergy)
-                            }
-                        }
-                    }
-                    
-                    // Notes
-                    if let notes = medicalRecord.notes {
-                        MedicalSection(title: "Clinical Notes", content: notes)
-                    }
-                }
-            } else {
-                VStack(spacing: 16) {
-                    Image(systemName: "doc.text")
-                        .font(.system(size: 48))
-                        .foregroundColor(.textTertiary)
-                    
-                    Text("No Medical Records")
-                        .headingStyle(.h4)
-                    
-                    Text("Medical information will appear here once available")
-                        .bodyStyle(.medium, color: .textSecondary)
-                        .multilineTextAlignment(.center)
-                }
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.vertical, 40)
+            VStack(spacing: 16) {
+                Image(systemName: "doc.text")
+                    .font(.system(size: 48))
+                    .foregroundColor(.textTertiary)
+                
+                Text("Medical Records")
+                    .headingStyle(.h4)
+                
+                Text("Medical information will be available in a future update")
+                    .bodyStyle(.medium, color: .textSecondary)
+                    .multilineTextAlignment(.center)
             }
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.vertical, 40)
             
             Spacer()
         }
@@ -401,18 +349,9 @@ struct PatientDetailView: View {
     
     private func loadAppointments() async {
         isLoadingAppointments = true
-        appointments = await patientService.getPatientAppointments(patient.id)
+        // For now, appointments will be empty since we simplified the API
+        appointments = []
         isLoadingAppointments = false
-    }
-    
-    private func getStatusColor(_ status: PatientStatus) -> Color {
-        switch status {
-        case .active: return .success
-        case .inactive: return .warning
-        case .discharged: return .textSecondary
-        case .pending: return .info
-        case .archived: return .textTertiary
-        }
     }
 }
 
@@ -439,66 +378,6 @@ struct InfoChip: View {
     }
 }
 
-struct ContactButton: View {
-    let icon: String
-    let text: String
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.caption)
-                    .foregroundColor(.teal500)
-                
-                Text(text)
-                    .captionStyle(.regular, color: .textLink)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Color.teal500.opacity(0.1))
-            .cornerRadius(8)
-        }
-    }
-}
-
-struct TabButton: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(Typography.bodyMedium)
-                .foregroundColor(isSelected ? .white : .textSecondary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .frame(maxWidth: .infinity)
-                .background(isSelected ? Color.teal500 : Color.clear)
-                .cornerRadius(6)
-        }
-    }
-}
-
-struct InfoRow: View {
-    let label: String
-    let value: String
-    
-    var body: some View {
-        HStack {
-            Text(label)
-                .bodyStyle(.medium, color: .textSecondary)
-                .frame(width: 120, alignment: .leading)
-            
-            Text(value)
-                .bodyStyle(.regular)
-            
-            Spacer()
-        }
-        .padding(.vertical, 2)
-    }
-}
 
 struct MedicalSection: View {
     let title: String
@@ -518,72 +397,6 @@ struct MedicalSection: View {
     }
 }
 
-struct MedicationRow: View {
-    let medication: Medication
-    
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(medication.name)
-                    .bodyStyle(.medium)
-                
-                Text("\(medication.dosage) - \(medication.frequency)")
-                    .captionStyle(.regular, color: .textSecondary)
-            }
-            
-            Spacer()
-            
-            Text("Active")
-                .captionStyle(.small, color: .success)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 2)
-                .background(Color.success.opacity(0.1))
-                .cornerRadius(4)
-        }
-        .padding(12)
-        .background(Color.surface)
-        .cornerRadius(8)
-    }
-}
-
-struct AllergyRow: View {
-    let allergy: Allergy
-    
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(allergy.allergen)
-                    .bodyStyle(.medium)
-                
-                if let reaction = allergy.reaction {
-                    Text(reaction)
-                        .captionStyle(.regular, color: .textSecondary)
-                }
-            }
-            
-            Spacer()
-            
-            Text(allergy.severity.displayName)
-                .captionStyle(.small, color: getSeverityColor(allergy.severity))
-                .padding(.horizontal, 8)
-                .padding(.vertical, 2)
-                .background(getSeverityColor(allergy.severity).opacity(0.1))
-                .cornerRadius(4)
-        }
-        .padding(12)
-        .background(Color.surface)
-        .cornerRadius(8)
-    }
-    
-    private func getSeverityColor(_ severity: AllergySeverity) -> Color {
-        switch severity {
-        case .mild: return .success
-        case .moderate: return .warning
-        case .severe: return .error
-        case .lifeThreatening: return .error
-        }
-    }
-}
 
 // MARK: - Previews
 
@@ -592,23 +405,19 @@ struct PatientDetailView_Previews: PreviewProvider {
     static var previews: some View {
         PatientDetailView(patient: Patient(
             id: "1",
-            publicId: "P001",
             firstName: "John",
             lastName: "Doe",
-            dateOfBirth: Calendar.current.date(byAdding: .year, value: -35, to: Date()) ?? Date(),
             email: "john.doe@example.com",
             phone: "(555) 123-4567",
-            address: nil,
-            emergencyContact: nil,
-            insurance: nil,
-            medicalRecord: nil,
-            status: .active,
-            assignedProviderId: "1",
-            assignedProviderName: "Dr. Smith",
-            createdAt: Date(),
-            updatedAt: Date(),
-            lastAppointment: nil,
-            nextAppointment: nil
+            dateOfBirth: Calendar.current.date(byAdding: .year, value: -35, to: Date()) ?? Date(),
+            status: "ACTIVE",
+            patientWorkflowStatus: "INTAKE_COMPLETE",
+            evaluationsCount: 2,
+            appointmentsCount: 5,
+            patientDetails: PatientAPIDetails(
+                id: "det-1",
+                publicId: "PAT-202508-0001"
+            )
         ))
     }
 }

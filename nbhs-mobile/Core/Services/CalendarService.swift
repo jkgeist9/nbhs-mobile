@@ -95,7 +95,7 @@ class CalendarService: ObservableObject {
     func createAppointment(_ request: CreateAppointmentRequest) async -> Appointment? {
         do {
             let response: APIResponse<Appointment> = try await apiClient.post(
-                endpoint: APIConfig.Endpoints.createAppointment,
+                endpoint: APIConfig.Endpoints.appointments,
                 body: request
             )
             

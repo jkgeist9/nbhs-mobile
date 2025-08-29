@@ -35,33 +35,45 @@ class AuthService: ObservableObject {
         
         do {
             let loginRequest = LoginRequest(email: email, password: password)
-            let response: APIResponse<LoginResponse> = try await apiClient.post(
-                endpoint: APIConfig.Endpoints.login,
-                body: loginRequest,
-                requiresAuth: false
-            )
             
-            guard let loginData = response.data,
-                  loginData.success,
-                  let user = loginData.user,
-                  let token = loginData.token else {
-                throw APIError.serverError(400, response.data?.message ?? "Login failed")
+            // Create URL request manually for direct response handling
+            guard let url = URL(string: APIConfig.baseURL + APIConfig.Endpoints.login) else {
+                throw APIError.invalidURL
             }
             
-            // Store authentication data
-            apiClient.setAuthToken(token)
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.httpBody = try JSONEncoder().encode(loginRequest)
             
-            if let refreshToken = loginData.refreshToken {
-                keychain.store(refreshToken: refreshToken)
+            // Add headers
+            for (key, value) in APIConfig.defaultHeaders {
+                request.setValue(value, forHTTPHeaderField: key)
             }
             
-            // Update state
-            self.user = user
-            self.isAuthenticated = true
+            let (data, response) = try await URLSession.shared.data(for: request)
             
-            // Check if biometric authentication is available and store token securely
-            if await isBiometricAuthenticationAvailable() {
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw APIError.noData
+            }
+            
+            if httpResponse.statusCode == 200 {
+                let loginData = try JSONDecoder().decode(LoginResponse.self, from: data)
+                
+                guard let user = loginData.user,
+                      let token = loginData.token else {
+                    throw APIError.serverError(400, loginData.message)
+                }
+                
+                // Store authentication data
+                apiClient.setAuthToken(token)
+                keychain.store(token: token)
                 keychain.storeWithBiometrics(value: token, for: "auth_token_biometric")
+                
+                self.user = user
+                self.isAuthenticated = true
+            } else {
+                let errorData = try? JSONDecoder().decode(LoginResponse.self, from: data)
+                throw APIError.serverError(httpResponse.statusCode, errorData?.message ?? "Login failed")
             }
             
         } catch {

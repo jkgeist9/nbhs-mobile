@@ -13,16 +13,16 @@ import Foundation
 struct User: Codable, Identifiable, Equatable {
     let id: String
     let publicId: String?
-    let createdAt: Date
-    let updatedAt: Date
+    let createdAt: Date?
+    let updatedAt: Date?
     let firstName: String
     let lastName: String
     let email: String
     let phone: String?
     let role: UserRole
-    let status: UserStatus
-    let mustChangePassword: Bool
-    let isEmailVerified: Bool
+    let status: UserStatus?
+    let mustChangePassword: Bool?
+    let isEmailVerified: Bool?
     let providerDetails: ProviderDetails?
     let patientDetails: PatientDetails?
     let guardianDetails: GuardianDetails?
@@ -221,7 +221,6 @@ struct LoginRequest: Codable {
 }
 
 struct LoginResponse: Codable {
-    let success: Bool
     let message: String
     let user: User?
     let token: String?

@@ -183,8 +183,7 @@ struct MoreView: View {
 
 struct InquiriesView: View {
     var body: some View {
-        Text("Inquiries View")
-            .navigationTitle("Inquiries")
+        InquiriesListView()
     }
 }
 

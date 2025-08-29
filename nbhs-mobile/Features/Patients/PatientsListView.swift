@@ -110,30 +110,7 @@ struct PatientsListView: View {
         VStack(spacing: 0) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    if let status = patientService.selectedStatus {
-                        FilterChip(
-                            title: status.displayName,
-                            isSelected: true
-                        ) {
-                            patientService.selectedStatus = nil
-                            Task {
-                                await patientService.loadPatients(refresh: true)
-                            }
-                        }
-                    }
-                    
-                    if patientService.sortOption != .name || patientService.sortOrder != .ascending {
-                        FilterChip(
-                            title: "Sort: \(patientService.sortOption.displayName)",
-                            isSelected: true
-                        ) {
-                            patientService.sortOption = .name
-                            patientService.sortOrder = .ascending
-                            Task {
-                                await patientService.loadPatients(refresh: true)
-                            }
-                        }
-                    }
+                    // Filter chips would go here when filters are re-implemented
                     
                     Button("Clear All") {
                         patientService.clearFilters()
@@ -163,8 +140,8 @@ struct PatientsListView: View {
                 Section {
                     PatientsSummaryCard(
                         totalPatients: patientService.filteredPatients.count,
-                        activePatients: patientService.filteredPatients.filter { $0.isActive }.count,
-                        patientsWithUpcoming: patientService.filteredPatients.filter { $0.hasUpcomingAppointment }.count
+                        activePatients: patientService.filteredPatients.filter { $0.status == "ACTIVE" }.count,
+                        patientsWithAppointments: patientService.filteredPatients.filter { ($0.appointmentsCount ?? 0) > 0 }.count
                     )
                 }
                 .listRowBackground(Color.clear)
@@ -228,9 +205,8 @@ struct PatientsListView: View {
     // MARK: - Computed Properties
     
     private var hasActiveFilters: Bool {
-        patientService.selectedStatus != nil ||
-        patientService.sortOption != .name ||
-        patientService.sortOrder != .ascending
+        // For now, no active filters since we simplified the model
+        false
     }
 }
 
@@ -269,7 +245,7 @@ struct FilterChip: View {
 struct PatientsSummaryCard: View {
     let totalPatients: Int
     let activePatients: Int
-    let patientsWithUpcoming: Int
+    let patientsWithAppointments: Int
     
     var body: some View {
         HStack(spacing: 20) {
@@ -286,8 +262,8 @@ struct PatientsSummaryCard: View {
             )
             
             SummaryItem(
-                title: "Upcoming",
-                value: "\(patientsWithUpcoming)",
+                title: "With Appts",
+                value: "\(patientsWithAppointments)",
                 color: .teal500
             )
         }
@@ -327,7 +303,7 @@ struct PatientRowView: View {
                 .frame(width: 44, height: 44)
                 .overlay(
                     Text(patient.initials)
-                        .font(Typography.labelMedium)
+                        .font(Typography.label)
                         .foregroundColor(.white)
                         .bold()
                 )
@@ -341,11 +317,11 @@ struct PatientRowView: View {
                     Spacer()
                     
                     // Status Badge
-                    Text(patient.status.displayName)
-                        .captionStyle(.small, color: getStatusColor(patient.status))
+                    Text(patient.status)
+                        .captionStyle(.small, color: .textSecondary)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)
-                        .background(getStatusColor(patient.status).opacity(0.1))
+                        .background(Color.textSecondary.opacity(0.1))
                         .cornerRadius(4)
                 }
                 
@@ -353,23 +329,23 @@ struct PatientRowView: View {
                     Text("Age \(patient.age)")
                         .captionStyle(.regular, color: .textSecondary)
                     
-                    if patient.hasUpcomingAppointment {
+                    if (patient.appointmentsCount ?? 0) > 0 {
                         HStack(spacing: 4) {
                             Image(systemName: "calendar")
                                 .font(.system(size: 10))
                                 .foregroundColor(.success)
                             
-                            Text("Upcoming")
+                            Text("\(patient.appointmentsCount ?? 0) appts")
                                 .captionStyle(.small, color: .success)
                         }
                     }
                 }
                 
-                if let lastAppointment = patient.daysSinceLastAppointment {
-                    Text("Last seen \(lastAppointment) days ago")
+                if (patient.evaluationsCount ?? 0) > 0 {
+                    Text("\(patient.evaluationsCount ?? 0) evaluations")
                         .captionStyle(.small, color: .textTertiary)
                 } else {
-                    Text("No previous appointments")
+                    Text("No evaluations")
                         .captionStyle(.small, color: .textTertiary)
                 }
             }
@@ -382,15 +358,6 @@ struct PatientRowView: View {
         .padding(.vertical, 4)
     }
     
-    private func getStatusColor(_ status: PatientStatus) -> Color {
-        switch status {
-        case .active: return .success
-        case .inactive: return .warning
-        case .discharged: return .textSecondary
-        case .pending: return .info
-        case .archived: return .textTertiary
-        }
-    }
 }
 
 struct PatientEmptyState: View {

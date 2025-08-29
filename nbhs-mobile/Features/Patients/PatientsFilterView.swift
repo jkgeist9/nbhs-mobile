@@ -12,69 +12,15 @@ struct PatientsFilterView: View {
     @StateObject private var patientService = PatientService.shared
     @Environment(\.dismiss) private var dismiss
     
-    @State private var selectedStatus: PatientStatus?
-    @State private var selectedSortOption: PatientSortOption
-    @State private var selectedSortOrder: SortOrder
+    @State private var selectedSortOrder: SortOrder = .ascending
     
     init() {
-        let service = PatientService.shared
-        _selectedStatus = State(initialValue: service.selectedStatus)
-        _selectedSortOption = State(initialValue: service.sortOption)
-        _selectedSortOrder = State(initialValue: service.sortOrder)
+        _selectedSortOrder = State(initialValue: .ascending)
     }
     
     var body: some View {
         NavigationView {
-            Form {
-                // Status Filter
-                Section("Status") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        ForEach(PatientStatus.allCases, id: \.self) { status in
-                            FilterOptionRow(
-                                title: status.displayName,
-                                subtitle: getStatusDescription(status),
-                                icon: status.icon,
-                                color: getStatusColor(status),
-                                isSelected: selectedStatus == status
-                            ) {
-                                if selectedStatus == status {
-                                    selectedStatus = nil
-                                } else {
-                                    selectedStatus = status
-                                }
-                            }
-                        }
-                        
-                        if selectedStatus != nil {
-                            Button("Clear Status Filter") {
-                                selectedStatus = nil
-                            }
-                            .font(Typography.bodyMedium)
-                            .foregroundColor(.textLink)
-                            .padding(.top, 8)
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-                
-                // Sort Options
-                Section("Sort By") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        ForEach(PatientSortOption.allCases, id: \.self) { option in
-                            FilterOptionRow(
-                                title: option.displayName,
-                                subtitle: getSortDescription(option),
-                                icon: getSortIcon(option),
-                                color: .textPrimary,
-                                isSelected: selectedSortOption == option
-                            ) {
-                                selectedSortOption = option
-                            }
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-                
+            Form {                
                 // Sort Order
                 Section("Sort Order") {
                     HStack(spacing: 20) {
@@ -102,8 +48,6 @@ struct PatientsFilterView: View {
                 // Reset Section
                 Section {
                     Button("Reset All Filters") {
-                        selectedStatus = nil
-                        selectedSortOption = .name
                         selectedSortOrder = .ascending
                     }
                     .font(Typography.bodyMedium)
@@ -133,55 +77,12 @@ struct PatientsFilterView: View {
     // MARK: - Helper Methods
     
     private func applyFilters() {
-        patientService.selectedStatus = selectedStatus
-        patientService.sortOption = selectedSortOption
-        patientService.sortOrder = selectedSortOrder
-        
+        // For now, just dismiss - sorting will be handled by the simplified Patient model
         Task {
             await patientService.loadPatients(refresh: true)
         }
         
         dismiss()
-    }
-    
-    private func getStatusDescription(_ status: PatientStatus) -> String {
-        switch status {
-        case .active: return "Currently receiving care"
-        case .inactive: return "Not currently active"
-        case .discharged: return "Treatment completed"
-        case .pending: return "Awaiting intake"
-        case .archived: return "Historical records"
-        }
-    }
-    
-    private func getStatusColor(_ status: PatientStatus) -> Color {
-        switch status {
-        case .active: return .success
-        case .inactive: return .warning
-        case .discharged: return .textSecondary
-        case .pending: return .info
-        case .archived: return .textTertiary
-        }
-    }
-    
-    private func getSortDescription(_ option: PatientSortOption) -> String {
-        switch option {
-        case .name: return "Alphabetical by full name"
-        case .lastAppointment: return "Most recent appointment first"
-        case .nextAppointment: return "Upcoming appointments first"
-        case .createdAt: return "Recently added patients first"
-        case .status: return "Group by patient status"
-        }
-    }
-    
-    private func getSortIcon(_ option: PatientSortOption) -> String {
-        switch option {
-        case .name: return "textformat"
-        case .lastAppointment: return "calendar.badge.clock"
-        case .nextAppointment: return "calendar.badge.plus"
-        case .createdAt: return "clock"
-        case .status: return "tag"
-        }
     }
 }
 

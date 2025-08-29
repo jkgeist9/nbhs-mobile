@@ -33,48 +33,83 @@ struct MainTabView: View {
     @EnvironmentObject private var authService: AuthService
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            // Dashboard
-            DashboardView()
-                .tabItem {
-                    Image(systemName: "squares.below.rectangle")
-                    Text("Dashboard")
-                }
-                .tag(0)
+        HStack(spacing: 0) {
+            // Sidebar Navigation
+            SidebarNavigation(selectedTab: $selectedTab)
             
-            // Patients
-            PatientsView()
-                .tabItem {
-                    Image(systemName: "person.2")
-                    Text("Patients")
+            // Main Content Area
+            Group {
+                switch selectedTab {
+                case 0:
+                    MainContentView(
+                        title: "Dashboard",
+                        searchPlaceholder: nil
+                    ) {
+                        DashboardView()
+                    }
+                case 1:
+                    MainContentView(
+                        title: "Patient Inquiries",
+                        searchPlaceholder: "Search inquiries...",
+                        headerAction: {
+                            AnyView(
+                                Button(action: {}) {
+                                    HStack {
+                                        Image(systemName: "plus")
+                                        Text("New Inquiry")
+                                    }
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(Color.teal500)
+                                    .cornerRadius(8)
+                                }
+                            )
+                        }
+                    ) {
+                        InquiriesView()
+                    }
+                case 2:
+                    MainContentView(
+                        title: "Patients",
+                        searchPlaceholder: "Search patients...",
+                        headerAction: {
+                            AnyView(
+                                Button(action: {}) {
+                                    HStack {
+                                        Image(systemName: "plus")
+                                        Text("New Patient")
+                                    }
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(Color.teal500)
+                                    .cornerRadius(8)
+                                }
+                            )
+                        }
+                    ) {
+                        PatientsView()
+                    }
+                case 3:
+                    MainContentView(
+                        title: "Calendar",
+                        searchPlaceholder: nil
+                    ) {
+                        CalendarView()
+                    }
+                default:
+                    MainContentView(
+                        title: "Dashboard",
+                        searchPlaceholder: nil
+                    ) {
+                        DashboardView()
+                    }
                 }
-                .tag(1)
-            
-            // Calendar
-            CalendarView()
-                .tabItem {
-                    Image(systemName: "calendar")
-                    Text("Calendar")
-                }
-                .tag(2)
-            
-            // Inquiries
-            InquiriesView()
-                .tabItem {
-                    Image(systemName: "tray")
-                    Text("Inquiries")
-                }
-                .tag(3)
-            
-            // More
-            MoreView()
-                .tabItem {
-                    Image(systemName: "ellipsis")
-                    Text("More")
-                }
-                .tag(4)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .tint(.teal500)
+        .ignoresSafeArea(.all)
     }
 }
 
@@ -92,73 +127,7 @@ struct PatientsView: View {
 // Calendar view is now implemented in Features/Calendar/CalendarView.swift
 
 
-struct MoreView: View {
-    @EnvironmentObject private var authService: AuthService
-    
-    var body: some View {
-        NavigationView {
-            List {
-                Section {
-                    NavigationLink(destination: EvaluationsView()) {
-                        Label("Evaluations", systemImage: "doc.text")
-                    }
-                    
-                    NavigationLink(destination: BillingView()) {
-                        Label("Billing", systemImage: "creditcard")
-                    }
-                    
-                    NavigationLink(destination: IVRView()) {
-                        Label("Call Center", systemImage: "phone")
-                    }
-                } header: {
-                    Text("Clinical Features")
-                }
-                
-                Section {
-                    NavigationLink(destination: DocumentsView()) {
-                        Label("Documents", systemImage: "folder")
-                    }
-                    
-                    NavigationLink(destination: ReportsView()) {
-                        Label("Reports", systemImage: "chart.bar")
-                    }
-                    
-                    NavigationLink(destination: SettingsView()) {
-                        Label("Settings", systemImage: "gear")
-                    }
-                } header: {
-                    Text("Tools")
-                }
-                
-                Section {
-                    if let user = authService.user {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(user.fullName)
-                                .bodyStyle(.medium)
-                            
-                            Text(user.email)
-                                .captionStyle(.regular, color: .textSecondary)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    
-                    Button(action: {
-                        Task {
-                            await authService.logout()
-                        }
-                    }) {
-                        Label("Sign Out", systemImage: "arrow.right.square")
-                            .foregroundColor(.error)
-                    }
-                } header: {
-                    Text("Account")
-                }
-            }
-            .navigationTitle("More")
-            .navigationBarTitleDisplayMode(.large)
-        }
-    }
-}
+// MoreView removed - functionality moved to sidebar navigation
 
 // MARK: - More View Destinations (Placeholders)
 

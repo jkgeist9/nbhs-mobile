@@ -16,61 +16,31 @@ struct PatientsListView: View {
     @State private var showingPatientDetail = false
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Search Bar
-                if showingSearch {
-                    searchBar
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                }
-                
-                // Filter Chips
-                if hasActiveFilters {
-                    filterChips
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                }
-                
-                // Patient List
-                patientList
+        VStack(spacing: 0) {
+            // Filter Chips
+            if hasActiveFilters {
+                filterChips
+                    .transition(.move(edge: .top).combined(with: .opacity))
             }
-            .nbNavigationTitle("Patients")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        withAnimation(.spring(response: 0.3)) {
-                            showingSearch.toggle()
-                        }
-                    }) {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(.teal500)
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingFilters = true
-                    }) {
-                        Image(systemName: hasActiveFilters ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
-                            .foregroundColor(.teal500)
-                    }
-                }
-            }
-            .sheet(isPresented: $showingFilters) {
-                PatientsFilterView()
-            }
-            .sheet(item: $selectedPatient) { patient in
-                PatientDetailView(patient: patient)
-            }
-            .task {
-                await patientService.loadPatients()
-            }
-            .refreshable {
-                await patientService.refreshData()
-            }
+            
+            // Patient List
+            patientList
+        }
+        .sheet(isPresented: $showingFilters) {
+            PatientsFilterView()
+        }
+        .sheet(item: $selectedPatient) { patient in
+            PatientDetailView(patient: patient)
+        }
+        .task {
+            await patientService.loadPatients()
+        }
+        .refreshable {
+            await patientService.refreshData()
         }
     }
     
-    // MARK: - Search Bar
+    // MARK: - Search Bar removed - now handled by MainContentView
     
     private var searchBar: some View {
         VStack(spacing: 0) {

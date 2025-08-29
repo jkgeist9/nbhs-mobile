@@ -16,92 +16,34 @@ struct InquiriesListView: View {
     @State private var showingInquiryDetail = false
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Search Bar
-                searchBar
-                
-                // Filter Chips
-                if hasActiveFilters {
-                    filterChips
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                }
-                
-                // Inquiry List
-                inquiryList
-            }
-            .nbNavigationTitle("Inquiries")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        withAnimation(.spring(response: 0.3)) {
-                            showingFilters = true
-                        }
-                    }) {
-                        Image(systemName: hasActiveFilters ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
-                            .foregroundColor(.teal500)
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingCreateInquiry = true
-                    }) {
-                        Image(systemName: "plus")
-                            .foregroundColor(.teal500)
-                    }
-                }
-            }
-            .sheet(isPresented: $showingFilters) {
-                InquiriesFilterView()
-            }
-            .sheet(isPresented: $showingCreateInquiry) {
-                CreateInquiryView()
-            }
-            .sheet(item: $selectedInquiry) { inquiry in
-                InquiryDetailView(inquiry: inquiry)
-            }
-            .task {
-                await inquiryService.loadInquiries()
-            }
-            .refreshable {
-                await inquiryService.refreshData()
-            }
-        }
-    }
-    
-    // MARK: - Search Bar
-    
-    private var searchBar: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 12) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.textTertiary)
-                
-                TextField("Search inquiries...", text: $inquiryService.searchText)
-                    .font(Typography.body)
-                    .textFieldStyle(PlainTextFieldStyle())
-                
-                if !inquiryService.searchText.isEmpty {
-                    Button(action: {
-                        inquiryService.searchText = ""
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.textTertiary)
-                    }
-                }
+            // Filter Chips
+            if hasActiveFilters {
+                filterChips
+                    .transition(.move(edge: .top).combined(with: .opacity))
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(Color.surface)
-            .cornerRadius(10)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
             
-            Divider()
+            // Inquiry List
+            inquiryList
         }
-        .background(Color.backgroundSecondary)
+        .sheet(isPresented: $showingFilters) {
+            InquiriesFilterView()
+        }
+        .sheet(isPresented: $showingCreateInquiry) {
+            CreateInquiryView()
+        }
+        .sheet(item: $selectedInquiry) { inquiry in
+            InquiryDetailView(inquiry: inquiry)
+        }
+        .task {
+            await inquiryService.loadInquiries()
+        }
+        .refreshable {
+            await inquiryService.refreshData()
+        }
     }
+    
+    // MARK: - Search Bar removed - now handled by MainContentView
     
     // MARK: - Filter Chips
     

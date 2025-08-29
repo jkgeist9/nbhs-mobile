@@ -18,8 +18,7 @@ struct DashboardView: View {
     @State private var selectedAlert: AlertItem?
     
     var body: some View {
-        NavigationView {
-            ScrollView {
+        ScrollView {
                 LazyVStack(spacing: 20) {
                     // Welcome Header
                     welcomeSection
@@ -79,7 +78,6 @@ struct DashboardView: View {
                         .foregroundColor(.textSecondary)
                 }
             }
-        }
         .sheet(item: $selectedTask) { task in
             TaskDetailView(task: task) { updatedTask in
                 // Handle task updates

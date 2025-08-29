@@ -11,35 +11,30 @@ import SwiftUI
 struct SidebarNavigation: View {
     @Binding var selectedTab: Int
     @EnvironmentObject private var authService: AuthService
+    @State private var isCollapsed = false
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header with Logo
-            HStack(spacing: 12) {
-                Image("NBHSLogo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 40, height: 30)
-                    .clipped()
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("NeuroBehavioral")
-                        .font(Typography.heading4)
-                        .foregroundColor(.textPrimary)
-                    
-                    Text("PROVIDER PORTAL")
-                        .font(Typography.caption)
-                        .foregroundColor(.teal500)
-                        .fontWeight(.semibold)
-                }
-                
+            // Header with Collapse/Expand Button
+            HStack {
                 Spacer()
+                
+                // Collapse/Expand Button
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        isCollapsed.toggle()
+                    }
+                }) {
+                    Image(systemName: isCollapsed ? "chevron.right" : "chevron.left")
+                        .foregroundColor(.white.opacity(0.8))
+                        .frame(width: 16, height: 16)
+                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
-            .background(Color.white)
             
             Divider()
+                .background(Color.white.opacity(0.3))
             
             // Navigation Items
             ScrollView {
@@ -47,7 +42,8 @@ struct SidebarNavigation: View {
                     NavigationItem(
                         title: "Dashboard",
                         icon: "squares.below.rectangle",
-                        isSelected: selectedTab == 0
+                        isSelected: selectedTab == 0,
+                        isCollapsed: isCollapsed
                     ) {
                         selectedTab = 0
                     }
@@ -55,7 +51,8 @@ struct SidebarNavigation: View {
                     NavigationItem(
                         title: "Inquiries",
                         icon: "tray",
-                        isSelected: selectedTab == 1
+                        isSelected: selectedTab == 1,
+                        isCollapsed: isCollapsed
                     ) {
                         selectedTab = 1
                     }
@@ -63,7 +60,8 @@ struct SidebarNavigation: View {
                     NavigationItem(
                         title: "Patients",
                         icon: "person.2",
-                        isSelected: selectedTab == 2
+                        isSelected: selectedTab == 2,
+                        isCollapsed: isCollapsed
                     ) {
                         selectedTab = 2
                     }
@@ -71,18 +69,21 @@ struct SidebarNavigation: View {
                     NavigationItem(
                         title: "Calendar",
                         icon: "calendar",
-                        isSelected: selectedTab == 3
+                        isSelected: selectedTab == 3,
+                        isCollapsed: isCollapsed
                     ) {
                         selectedTab = 3
                     }
                     
                     Divider()
+                        .background(Color.white.opacity(0.3))
                         .padding(.vertical, 8)
                     
                     NavigationItem(
                         title: "Evaluations",
                         icon: "doc.text",
-                        isSelected: false
+                        isSelected: false,
+                        isCollapsed: isCollapsed
                     ) {
                         // Handle evaluations tap
                     }
@@ -90,7 +91,8 @@ struct SidebarNavigation: View {
                     NavigationItem(
                         title: "Documents",
                         icon: "folder",
-                        isSelected: false
+                        isSelected: false,
+                        isCollapsed: isCollapsed
                     ) {
                         // Handle documents tap
                     }
@@ -98,7 +100,8 @@ struct SidebarNavigation: View {
                     NavigationItem(
                         title: "Tasks",
                         icon: "checkmark.square",
-                        isSelected: false
+                        isSelected: false,
+                        isCollapsed: isCollapsed
                     ) {
                         // Handle tasks tap
                     }
@@ -106,7 +109,8 @@ struct SidebarNavigation: View {
                     NavigationItem(
                         title: "Messages",
                         icon: "message",
-                        isSelected: false
+                        isSelected: false,
+                        isCollapsed: isCollapsed
                     ) {
                         // Handle messages tap
                     }
@@ -114,7 +118,8 @@ struct SidebarNavigation: View {
                     NavigationItem(
                         title: "Billing",
                         icon: "creditcard",
-                        isSelected: false
+                        isSelected: false,
+                        isCollapsed: isCollapsed
                     ) {
                         // Handle billing tap
                     }
@@ -122,7 +127,8 @@ struct SidebarNavigation: View {
                     NavigationItem(
                         title: "Call Center",
                         icon: "phone",
-                        isSelected: false
+                        isSelected: false,
+                        isCollapsed: isCollapsed
                     ) {
                         // Handle call center tap
                     }
@@ -132,43 +138,8 @@ struct SidebarNavigation: View {
             }
             
             Spacer()
-            
-            // User Info and Logout
-            VStack(spacing: 12) {
-                Divider()
-                
-                if let user = authService.user {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(user.fullName)
-                            .bodyStyle(.medium)
-                        
-                        Text(user.email)
-                            .captionStyle(.regular, color: .textSecondary)
-                        
-                        Text("PROVIDER")
-                            .captionStyle(.regular, color: .teal500)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 20)
-                }
-                
-                Button(action: {
-                    Task {
-                        await authService.logout()
-                    }
-                }) {
-                    HStack {
-                        Image(systemName: "arrow.right.square")
-                        Text("Sign Out")
-                    }
-                    .foregroundColor(.error)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 20)
-            }
         }
-        .frame(width: 240)
+        .frame(width: isCollapsed ? 80 : 240)
         .background(Color(red: 0.026, green: 0.549, blue: 0.635)) // Teal background matching website
         .foregroundColor(.white)
     }
@@ -178,22 +149,26 @@ struct NavigationItem: View {
     let title: String
     let icon: String
     let isSelected: Bool
+    let isCollapsed: Bool
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 12) {
+            HStack(spacing: isCollapsed ? 0 : 12) {
                 Image(systemName: icon)
                     .frame(width: 20)
                     .foregroundColor(isSelected ? .white : .white.opacity(0.8))
                 
-                Text(title)
-                    .bodyStyle(.medium)
-                    .foregroundColor(isSelected ? .white : .white.opacity(0.8))
-                
-                Spacer()
+                if !isCollapsed {
+                    Text(title)
+                        .font(Typography.bodyMedium)
+                        .foregroundColor(isSelected ? .white : .white.opacity(0.8))
+                    
+                    Spacer()
+                }
             }
-            .padding(.horizontal, 16)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, isCollapsed ? 8 : 16)
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 8)
@@ -201,6 +176,7 @@ struct NavigationItem: View {
             )
         }
         .buttonStyle(PlainButtonStyle())
+        .help(isCollapsed ? title : "")
     }
 }
 

@@ -15,8 +15,7 @@ struct CalendarView: View {
     @State private var showingAppointmentDetail = false
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
+        VStack(spacing: 0) {
                 // Calendar Mode Selector
                 calendarModeSelector
                 
@@ -39,29 +38,6 @@ struct CalendarView: View {
                     .padding(.bottom, 20)
                 }
             }
-            .navigationTitle("Calendar")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Today") {
-                        calendarService.selectDate(Date())
-                        Task {
-                            await calendarService.loadTodaysAppointments()
-                        }
-                    }
-                    .font(Typography.bodyMedium)
-                    .foregroundColor(.teal500)
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        calendarService.showingCreateAppointment = true
-                    }) {
-                        Image(systemName: "plus")
-                            .foregroundColor(.teal500)
-                    }
-                }
-            }
             .sheet(item: $selectedAppointment) { appointment in
                 AppointmentDetailView(appointment: appointment)
             }
@@ -74,7 +50,6 @@ struct CalendarView: View {
             .refreshable {
                 await calendarService.refreshData()
             }
-        }
     }
     
     // MARK: - Calendar Mode Selector

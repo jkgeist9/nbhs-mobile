@@ -68,15 +68,22 @@ struct LoginView: View {
                     .frame(width: 120, height: 80)
                     .clipped()
                 
-                VStack(spacing: 8) {
-                    Text("NeuroBehavioral Health Services")
-                        .font(Typography.heading3)
+                VStack(spacing: 4) {
+                    Text("NeuroBehavioral")
+                        .font(Font.merriweather(28, weight: .regular))
                         .foregroundColor(.textPrimary)
+                        .multilineTextAlignment(.center)
+                    
+                    Text("HEALTH SERVICES")
+                        .font(Font.montserrat(14, weight: .medium))
+                        .foregroundColor(.textSecondary)
+                        .tracking(2)
                         .multilineTextAlignment(.center)
                     
                     Text("Provider Portal")
                         .font(Typography.bodyLarge)
                         .foregroundColor(.textSecondary)
+                        .padding(.top, 8)
                 }
             }
             

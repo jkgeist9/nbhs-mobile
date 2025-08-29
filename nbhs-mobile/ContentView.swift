@@ -33,11 +33,16 @@ struct MainTabView: View {
     @EnvironmentObject private var authService: AuthService
     
     var body: some View {
-        HStack(spacing: 0) {
-            // Sidebar Navigation
-            SidebarNavigation(selectedTab: $selectedTab)
+        VStack(spacing: 0) {
+            // Top Header
+            TopHeader()
+                .environmentObject(authService)
             
-            // Main Content Area
+            HStack(spacing: 0) {
+                // Sidebar Navigation
+                SidebarNavigation(selectedTab: $selectedTab)
+                
+                // Main Content Area
             Group {
                 switch selectedTab {
                 case 0:
@@ -106,10 +111,11 @@ struct MainTabView: View {
                         DashboardView()
                     }
                 }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .ignoresSafeArea(.all)
+        .ignoresSafeArea(.container, edges: .bottom)
     }
 }
 

@@ -162,6 +162,7 @@ struct NBInputField: View {
                         .disabled(isDisabled)
                         .textContentType(type.textContentType)
                         .autocapitalization(type.autocapitalization)
+                        .disableAutocorrection(true)
                         .onChange(of: text) { oldValue, newValue in
                             if let maxLength = maxLength, newValue.count > maxLength {
                                 text = String(newValue.prefix(maxLength))
@@ -175,6 +176,7 @@ struct NBInputField: View {
                         .keyboardType(type.keyboardType)
                         .textContentType(type.textContentType)
                         .autocapitalization(type.autocapitalization)
+                        .disableAutocorrection(type == .email || type == .password)
                         .onChange(of: text) { oldValue, newValue in
                             if let maxLength = maxLength, newValue.count > maxLength {
                                 text = String(newValue.prefix(maxLength))

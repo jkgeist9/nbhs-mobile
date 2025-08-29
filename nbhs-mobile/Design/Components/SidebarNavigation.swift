@@ -146,7 +146,7 @@ struct SidebarNavigation: View {
                             .captionStyle(.regular, color: .textSecondary)
                         
                         Text("PROVIDER")
-                            .captionStyle(.medium, color: .teal500)
+                            .captionStyle(.regular, color: .teal500)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 20)

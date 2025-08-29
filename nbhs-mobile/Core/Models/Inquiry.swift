@@ -19,7 +19,7 @@ struct Inquiry: Codable, Identifiable {
     let inquiryFor: String
     let patientId: String
     let guardianId: String?
-    let referralSource: String
+    let referralSource: String?
     let referralDetails: String?
     let urgencyLevel: String
     let preferredContact: String
@@ -90,6 +90,7 @@ struct Inquiry: Codable, Identifiable {
     var assignedProviderId: String? { assignedToId }
     var assignedProviderName: String? { nil } // Would need to be fetched from backend
     var source: InquirySource { 
+        guard let referralSource = referralSource else { return .other }
         switch referralSource.uppercased() {
         case "WEBSITE": return .website
         case "PHONE": return .phone
@@ -97,7 +98,7 @@ struct Inquiry: Codable, Identifiable {
         case "REFERRAL": return .referral
         case "WALK_IN", "WALKIN": return .walkIn
         case "PSYCHIATRIST": return .referral
-        default: return .phone
+        default: return .other
         }
     }
     var notes: String? { reviewNotes }

@@ -15,27 +15,6 @@ struct SidebarNavigation: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header with Collapse/Expand Button
-            HStack {
-                Spacer()
-                
-                // Collapse/Expand Button
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        isCollapsed.toggle()
-                    }
-                }) {
-                    Image(systemName: isCollapsed ? "chevron.right" : "chevron.left")
-                        .foregroundColor(.white.opacity(0.8))
-                        .frame(width: 16, height: 16)
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
-            
-            Divider()
-                .background(Color.white.opacity(0.3))
-            
             // Navigation Items
             ScrollView {
                 VStack(spacing: 2) {
@@ -138,6 +117,29 @@ struct SidebarNavigation: View {
             }
             
             Spacer()
+            
+            // Collapse/Expand Button at Bottom
+            VStack(spacing: 0) {
+                Divider()
+                    .background(Color.white.opacity(0.3))
+                
+                HStack {
+                    Spacer()
+                    
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            isCollapsed.toggle()
+                        }
+                    }) {
+                        Image(systemName: isCollapsed ? "chevron.right" : "chevron.left")
+                            .foregroundColor(.white.opacity(0.8))
+                            .frame(width: 16, height: 16)
+                    }
+                    
+                    Spacer()
+                }
+                .padding(.vertical, 16)
+            }
         }
         .frame(width: isCollapsed ? 80 : 240)
         .background(Color(red: 0.026, green: 0.549, blue: 0.635)) // Teal background matching website

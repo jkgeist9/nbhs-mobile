@@ -80,104 +80,16 @@ struct MainTabView: View {
 
 // MARK: - Placeholder Views
 
-struct DashboardView: View {
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 24) {
-                Text("Provider Dashboard")
-                    .headingStyle(.h1)
-                
-                Text("Welcome to the NBHS Provider Portal")
-                    .bodyStyle(.large, color: .textSecondary)
-                
-                VStack(spacing: 16) {
-                    dashboardCard(
-                        title: "Today's Appointments",
-                        value: "8",
-                        icon: "calendar",
-                        color: .teal500
-                    )
-                    
-                    dashboardCard(
-                        title: "Pending Inquiries",
-                        value: "12",
-                        icon: "envelope",
-                        color: .warning
-                    )
-                    
-                    dashboardCard(
-                        title: "Active Patients",
-                        value: "156",
-                        icon: "person.2",
-                        color: .success
-                    )
-                }
-                
-                Spacer()
-            }
-            .padding()
-            .navigationTitle("Dashboard")
-            .navigationBarTitleDisplayMode(.large)
-        }
-    }
-    
-    private func dashboardCard(title: String, value: String, icon: String, color: Color) -> some View {
-        HStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.system(size: 24))
-                .foregroundColor(color)
-                .frame(width: 40, height: 40)
-                .background(color.opacity(0.1))
-                .cornerRadius(10)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .bodyStyle(.medium, color: .textSecondary)
-                
-                Text(value)
-                    .headingStyle(.h2)
-            }
-            
-            Spacer()
-        }
-        .padding(16)
-        .background(Color.surface)
-        .cornerRadius(12)
-        .shadow(color: .shadowLight, radius: 4, x: 0, y: 2)
-    }
-}
+// Dashboard is now implemented in Features/Dashboard/DashboardView.swift
 
+// Patients view is now implemented in Features/Patients/PatientsListView.swift
 struct PatientsView: View {
     var body: some View {
-        NavigationView {
-            VStack {
-                Text("Patients will be displayed here")
-                    .bodyStyle(.large, color: .textSecondary)
-                
-                Spacer()
-            }
-            .padding()
-            .navigationTitle("Patients")
-            .navigationBarTitleDisplayMode(.large)
-        }
+        PatientsListView()
     }
 }
 
-struct CalendarView: View {
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Calendar view will be displayed here")
-                    .bodyStyle(.large, color: .textSecondary)
-                
-                Spacer()
-            }
-            .padding()
-            .navigationTitle("Calendar")
-            .navigationBarTitleDisplayMode(.large)
-        }
-    }
-}
+// Calendar view is now implemented in Features/Calendar/CalendarView.swift
 
 struct MessagesView: View {
     var body: some View {
